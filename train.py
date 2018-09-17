@@ -5,14 +5,21 @@ from models import create_model
 from util.visualizer import Visualizer
 
 if __name__ == '__main__':
+    # load train options (dataset names, model, GPU, etc...).
     opt = TrainOptions().parse()
+    # creates a data loader for the given dataset.
     data_loader = CreateDataLoader(opt)
+    # gets the dataset of the current dataloader (actually it returns the instance of the dataloader itself).
     dataset = data_loader.load_data()
+    # gets the size of the dataset.
     dataset_size = len(data_loader)
     print('#training images = %d' % dataset_size)
 
+    # creates the model based on the model passed in options (cycle_gan or pix2pix).
     model = create_model(opt)
+    # creates schedulers, or, if the train has to be resumed, load the nets.
     model.setup(opt)
+    # create a new visualizer.
     visualizer = Visualizer(opt)
     total_steps = 0
 
