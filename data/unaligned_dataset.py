@@ -32,13 +32,12 @@ class UnalignedDataset(BaseDataset):
         else:
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
-        # print('(A, B) = (%d, %d)' % (index_A, index_B))
         A_img = Image.open(A_path).convert('RGB')
         B_img = Image.open(B_path).convert('RGB')
 
         A = self.transform(A_img)
         B = self.transform(B_img)
-        if self.opt.which_direction == 'BtoA':
+        if self.opt.direction == 'BtoA':
             input_nc = self.opt.output_nc
             output_nc = self.opt.input_nc
         else:
