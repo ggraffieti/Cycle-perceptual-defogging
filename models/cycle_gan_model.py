@@ -3,6 +3,7 @@ import itertools
 from util.image_pool import ImagePool
 from .base_model import BaseModel
 from . import networks
+from .perceptual_model import PerceptualModel
 
 
 class CycleGANModel(BaseModel):
@@ -24,8 +25,10 @@ class CycleGANModel(BaseModel):
     def initialize(self, opt):
         BaseModel.initialize(self, opt)
 
+        self.perceptualModel = PerceptualModel(self.device)
+
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'D_B', 'G_B', 'cycle_B', 'idt_B']
+        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'perc_A' 'D_B', 'G_B', 'cycle_B', 'idt_B', 'perc_B']
         # specify the images you want to save/display. The program will call base_model.get_current_visuals
         visual_names_A = ['real_A', 'fake_B', 'rec_A']
         visual_names_B = ['real_B', 'fake_A', 'rec_B']
@@ -129,8 +132,12 @@ class CycleGANModel(BaseModel):
         self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A
         # Backward cycle loss
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
+        # Forward perceptual loss
+        self.loss_perc_A = self.perceptualModel.perceptual_loss(self.real_A, self.rec_A) * 0.1
+        # Backward perceptual loss
+        self.loss_perc_B = self.perceptualModel.perceptual_loss(self.real_B, self.rec_B) * 0.1
         # combined loss
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_perc_A + self.loss_perc_B
         self.loss_G.backward()
 
     def optimize_parameters(self):

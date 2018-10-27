@@ -21,12 +21,11 @@ class PerceptualModel:
     def perceptual_loss(self, original_image, cycle_image):
         """
         Calculate the perceptual loss of the 2 given images.
-        The original image has to be given already transformed with imageNet mean and std.
-        Cycle image has to be in the range [-1, 1].
+        The original and cycle image have to be in the range [-1, 1].
         """
         self.pool2Features.clear()
         self.pool5Features.clear()
-        self.pool5Features.append(self.vgg16(original_image))
+        self.pool5Features.append(self.vgg16(self.transform(original_image)))
         self.pool5Features.append(self.vgg16(self.transform(cycle_image)))
         l1 = self.loss_function(self.pool2Features[0].data, self.pool2Features[1].data)
         l2 = self.loss_function(self.pool5Features[0].data, self.pool5Features[1].data)
