@@ -28,7 +28,7 @@ class CycleGANModel(BaseModel):
         self.perceptualModel = PerceptualModel(self.device)
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'perc_A' 'D_B', 'G_B', 'cycle_B', 'idt_B', 'perc_B']
+        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'perc_A', 'D_B', 'G_B', 'cycle_B', 'idt_B', 'perc_B']
         # specify the images you want to save/display. The program will call base_model.get_current_visuals
         visual_names_A = ['real_A', 'fake_B', 'rec_A']
         visual_names_B = ['real_B', 'fake_A', 'rec_B']
