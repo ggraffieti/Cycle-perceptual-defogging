@@ -14,6 +14,7 @@ from PIL import Image
 import torch
 import numpy as np
 from util import util
+from imutils.video import VideoStream
 
 
 if __name__ == '__main__':
@@ -24,8 +25,6 @@ if __name__ == '__main__':
     opt.serial_batches = True  # no shuffle
     opt.no_flip = True    # no flip
     opt.display_id = -1   # no visdom display
-    data_loader = CreateDataLoader(opt)
-    dataset = data_loader.load_data()
     model = create_model(opt)
     model.setup(opt)
     # test with eval mode. This only affects layers like batchnorm and dropout.
@@ -33,18 +32,19 @@ if __name__ == '__main__':
     # CycleGAN: It should not affect CycleGAN as CycleGAN uses instancenorm without dropout.
     if opt.eval:
         model.eval()
+    transform_list = []
+    osize = [opt.loadSize, opt.loadSize]
+    transform_list.append(transforms.Resize(osize, Image.BICUBIC))
+    transform_list.append(transforms.RandomCrop(opt.fineSize))
+    transform_list += [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+    totTrans = transforms.Compose(transform_list)
 
-    for i, data in enumerate(dataset):
-        if i >= opt.num_test:
-            break
-        image = Image.open("./datasets/mine/jurassic_park.jpg").convert('RGB')
-        transform_list = []
-        osize = [opt.loadSize, opt.loadSize]
-        transform_list.append(transforms.Resize(osize, Image.BICUBIC))
-        transform_list.append(transforms.RandomCrop(opt.fineSize))
-        transform_list += [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-        totTrans = transforms.Compose(transform_list)
+    vs = VideoStream(src=0).start()
+    time.sleep(2.0)
 
+    while True:
+        im = vs.read()
+        image = Image.fromarray(im)
         tens = totTrans(image)
         if opt.direction == 'BtoA':
             input_nc = opt.output_nc
@@ -61,8 +61,25 @@ if __name__ == '__main__':
 
         output = util.tensor2im(outputM['fake_B'])
         original = util.tensor2im(outputM['real_A'])
-        output = output[..., [2, 0, 1]]
+        # output = output[..., [2, 0, 1]]
+        # original = original[..., [2, 0, 1]]
 
         cv2.imshow("Input", original)
         cv2.imshow("Output", output)
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
+        key = cv2.waitKey(1) & 0xFF
+
+        # if the `n` key is pressed (for "next"), load the next neural
+        # style transfer model
+        if key == ord("n"):
+            # grab the next nueral style transfer model model and load it
+            (modelID, modelPath) = next(modelIter)
+            print("[INFO] {}. {}".format(modelID + 1, modelPath))
+            net = cv2.dnn.readNetFromTorch(modelPath)
+
+        # otheriwse, if the `q` key was pressed, break from the loop
+        elif key == ord("q"):
+            break
+
+    cv2.destroyAllWindows()
+    vs.stop()

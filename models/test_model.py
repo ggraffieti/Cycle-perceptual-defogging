@@ -39,8 +39,8 @@ class TestModel(BaseModel):
 
     def set_input(self, input):
         # we need to use single_dataset mode
-        self.real_A = input['A'].to(self.device)
-        self.image_paths = input['A_paths']
+        self.real_A = input.to(self.device)
+        # self.image_paths = input['A_paths']
 
     def forward(self):
         self.fake_B = self.netG(self.real_A)
