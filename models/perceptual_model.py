@@ -12,7 +12,7 @@ class PerceptualModel:
         for param in self.vgg16.parameters():
             param.require_grad = False
         self.vgg16[9].register_forward_hook(self.hook)
-        self.transform = Transform().to(device)
+        self.transform = Transform(device).to(device)
         self.loss_function = nn.MSELoss(size_average=True, reduce=True)
 
     def hook(self, model, input, output):
@@ -33,11 +33,11 @@ class PerceptualModel:
 
 
 class Transform(nn.Module):
-    def __init__(self, cnn_normalization_mean=torch.Tensor([0.485, 0.456, 0.406]),
+    def __init__(self, device, cnn_normalization_mean=torch.Tensor([0.485, 0.456, 0.406]),
                  cnn_normalization_std=torch.Tensor([0.229, 0.224, 0.225])):
         super(Transform, self).__init__()
-        self.mean = torch.Tensor(cnn_normalization_mean).view(-1, 1, 1)
-        self.std = torch.Tensor(cnn_normalization_std).view(-1, 1, 1)
+        self.mean = torch.Tensor(cnn_normalization_mean).to(device).view(-1, 1, 1)
+        self.std = torch.Tensor(cnn_normalization_std).to(device).view(-1, 1, 1)
 
     def forward(self, img):
         img = (img + 1) / 2
