@@ -9,8 +9,8 @@ class PerceptualModel:
         self.pool2Features = []
         self.pool5Features = []
         # don't accumulate gradient
-        # for param in self.vgg16.parameters():
-        #    param.require_grad = False
+        for param in self.vgg16.parameters():
+            param.require_grad = False
         self.vgg16[9].register_forward_hook(self.hook)
         self.transform = Transform(device).to(device)
         self.loss_function = nn.MSELoss(size_average=True, reduce=True)
@@ -27,8 +27,8 @@ class PerceptualModel:
         self.pool5Features.clear()
         self.pool5Features.append(self.vgg16(self.transform(original_image)))
         self.pool5Features.append(self.vgg16(self.transform(cycle_image)))
-        l1 = self.loss_function(self.pool2Features[1].data, self.pool2Features[0].data)
-        l2 = self.loss_function(self.pool5Features[1].data, self.pool5Features[0].data)
+        l1 = self.loss_function(self.pool2Features[1], self.pool2Features[0].detach())
+        l2 = self.loss_function(self.pool5Features[1], self.pool5Features[0].detach())
         return l1 + l2
 
 
