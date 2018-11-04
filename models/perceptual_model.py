@@ -27,8 +27,8 @@ class PerceptualModel:
         self.pool5Features.clear()
         self.pool5Features.append(self.vgg16(self.transform(original_image)))
         self.pool5Features.append(self.vgg16(self.transform(cycle_image)))
-        l1 = self.loss_function(self.pool2Features[0].data, self.pool2Features[1].data)
-        l2 = self.loss_function(self.pool5Features[0].data, self.pool5Features[1].data)
+        l1 = self.loss_function(self.pool2Features[0], self.pool2Features[1])
+        l2 = self.loss_function(self.pool5Features[0], self.pool5Features[1])
         return l1 + l2
 
 
