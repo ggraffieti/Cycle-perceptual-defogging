@@ -133,9 +133,9 @@ class CycleGANModel(BaseModel):
         # Backward cycle loss
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
         # Forward perceptual loss
-        self.loss_perc_A = self.perceptualModel.perceptual_loss(self.real_A, self.rec_A) * 0.1
+        self.loss_perc_A = self.perceptualModel.perceptual_loss(self.real_A, self.rec_A) * 0.5
         # Backward perceptual loss
-        self.loss_perc_B = self.perceptualModel.perceptual_loss(self.real_B, self.rec_B) * 0.1
+        self.loss_perc_B = self.perceptualModel.perceptual_loss(self.real_B, self.rec_B) * 0.5
         # combined loss
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_perc_A + self.loss_perc_B
         self.loss_G.backward()
