@@ -1,8 +1,8 @@
-<img src='imgs/horse2zebra.gif' align="right" width=384>
-
-<br><br><br>
-
 # Totally unpaired defogging with cycleGAN (CyclePerceptualDefogging)
+
+<img src='imgs/example.png' align="center" width=400>
+
+<br/><br/><br/>
 
 We provide an extended version of the [original cycleGAN code](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) optimized for addressing the problem of defogging.
 
